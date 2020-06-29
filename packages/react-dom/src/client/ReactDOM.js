@@ -335,7 +335,7 @@ function ReactRoot(
   isConcurrent: boolean,
   hydrate: boolean,
 ) {
-  const root = DOMRenderer.createContainer(container, isConcurrent, hydrate);
+  const root = DOMRenderer.createContainer(container, isConcurrent, hydrate);// 容器 false false
   this._internalRoot = root;
 }
 ReactRoot.prototype.render = function(
@@ -343,11 +343,11 @@ ReactRoot.prototype.render = function(
   callback: ?() => mixed,
 ): Work {
   const root = this._internalRoot;
-  const work = new ReactWork();
+  const work = new ReactWork();//回调放到异步任务里面
   callback = callback === undefined ? null : callback;
-  if (__DEV__) {
-    warnOnInvalidCallback(callback, 'render');
-  }
+//   if (__DEV__) {
+//     warnOnInvalidCallback(callback, 'render');
+//   }
   if (callback !== null) {
     work.then(callback);
   }
@@ -448,7 +448,7 @@ function shouldHydrateDueToLegacyHeuristic(container) {
   return !!(
     rootElement &&
     rootElement.nodeType === ELEMENT_NODE &&
-    rootElement.hasAttribute(ROOT_ATTRIBUTE_NAME)
+    rootElement.hasAttribute(ROOT_ATTRIBUTE_NAME)//data-reactroot 用于服务端渲染调和
   );
 }
 
@@ -465,8 +465,8 @@ function legacyCreateRootFromDOMContainer(
   forceHydrate: boolean,
 ): Root {
   const shouldHydrate =
-    forceHydrate || shouldHydrateDueToLegacyHeuristic(container);
-  // First clear any existing content.
+    forceHydrate || shouldHydrateDueToLegacyHeuristic(container); //首次false 
+  // 清空容器元素的子元素
   if (!shouldHydrate) {
     let warned = false;
     let rootSibling;
@@ -489,17 +489,17 @@ function legacyCreateRootFromDOMContainer(
       container.removeChild(rootSibling);
     }
   }
-  if (__DEV__) {
-    if (shouldHydrate && !forceHydrate && !warnedAboutHydrateAPI) {
-      warnedAboutHydrateAPI = true;
-      lowPriorityWarning(
-        false,
-        'render(): Calling ReactDOM.render() to hydrate server-rendered markup ' +
-          'will stop working in React v17. Replace the ReactDOM.render() call ' +
-          'with ReactDOM.hydrate() if you want React to attach to the server HTML.',
-      );
-    }
-  }
+//   if (__DEV__) {
+//     if (shouldHydrate && !forceHydrate && !warnedAboutHydrateAPI) {
+//       warnedAboutHydrateAPI = true;
+//       lowPriorityWarning(
+//         false,
+//         'render(): Calling ReactDOM.render() to hydrate server-rendered markup ' +
+//           'will stop working in React v17. Replace the ReactDOM.render() call ' +
+//           'with ReactDOM.hydrate() if you want React to attach to the server HTML.',
+//       );
+//     }
+//   }
   // Legacy roots are not async by default.
   const isConcurrent = false;
   return new ReactRoot(container, isConcurrent, shouldHydrate);
@@ -512,34 +512,34 @@ function legacyRenderSubtreeIntoContainer(
   forceHydrate: boolean,
   callback: ?Function,
 ) {
-  // TODO: Ensure all entry points contain this check
-  invariant(
-    isValidContainer(container),
-    'Target container is not a DOM element.',
-  );
+//   // TODO: Ensure all entry points contain this check
+//   invariant(
+//     isValidContainer(container),
+//     'Target container is not a DOM element.',
+//   );
 
-  if (__DEV__) {
-    topLevelUpdateWarnings(container);
-  }
+//   if (__DEV__) {
+//     topLevelUpdateWarnings(container);
+//   }
 
   // TODO: Without `any` type, Flow says "Property cannot be accessed on any
   // member of intersection type." Whyyyyyy.
-  let root: Root = (container._reactRootContainer: any);
+  let root: Root = (container._reactRootContainer: any);//container._reactRootContainer 不存在则首次渲染
   if (!root) {
     // Initial mount
     root = container._reactRootContainer = legacyCreateRootFromDOMContainer(
       container,
       forceHydrate,
-    );
+    );//获取new ReactRoot
     if (typeof callback === 'function') {
       const originalCallback = callback;
       callback = function() {
-        const instance = DOMRenderer.getPublicRootInstance(root._internalRoot);
+        const instance = DOMRenderer.getPublicRootInstance(root._internalRoot);//rootFiberchild.stateNode
         originalCallback.call(instance);
       };
     }
-    // Initial mount should not be batched.
-    DOMRenderer.unbatchedUpdates(() => {
+    // 初始化完整更新而不是批量更新
+    DOMRenderer.unbatchedUpdates(() => {//
       if (parentComponent != null) {
         root.legacy_renderSubtreeIntoContainer(
           parentComponent,

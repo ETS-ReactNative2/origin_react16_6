@@ -112,25 +112,25 @@ function scheduleRootUpdate(
   expirationTime: ExpirationTime,
   callback: ?Function,
 ) {
-  if (__DEV__) {
-    if (
-      ReactCurrentFiber.phase === 'render' &&
-      ReactCurrentFiber.current !== null &&
-      !didWarnAboutNestedUpdates
-    ) {
-      didWarnAboutNestedUpdates = true;
-      warningWithoutStack(
-        false,
-        'Render methods should be a pure function of props and state; ' +
-          'triggering nested component updates from render is not allowed. ' +
-          'If necessary, trigger nested updates in componentDidUpdate.\n\n' +
-          'Check the render method of %s.',
-        getComponentName(ReactCurrentFiber.current.type) || 'Unknown',
-      );
-    }
-  }
+//   if (__DEV__) {
+//     if (
+//       ReactCurrentFiber.phase === 'render' &&
+//       ReactCurrentFiber.current !== null &&
+//       !didWarnAboutNestedUpdates
+//     ) {
+//       didWarnAboutNestedUpdates = true;
+//       warningWithoutStack(
+//         false,
+//         'Render methods should be a pure function of props and state; ' +
+//           'triggering nested component updates from render is not allowed. ' +
+//           'If necessary, trigger nested updates in componentDidUpdate.\n\n' +
+//           'Check the render method of %s.',
+//         getComponentName(ReactCurrentFiber.current.type) || 'Unknown',
+//       );
+//     }
+//   }
 
-  const update = createUpdate(expirationTime);
+  const update = createUpdate(expirationTime);//创建一个更新任务
   // Caution: React DevTools currently depends on this property
   // being called "element".
   update.payload = {element};
@@ -145,7 +145,7 @@ function scheduleRootUpdate(
     );
     update.callback = callback;
   }
-  enqueueUpdate(current, update);
+  enqueueUpdate(current, update);//加入更新队列
 
   scheduleWork(current, expirationTime);
   return expirationTime;
@@ -159,21 +159,21 @@ export function updateContainerAtExpirationTime(
   callback: ?Function,
 ) {
   // TODO: If this is a nested container, this won't be the root.
-  const current = container.current;
+  const current = container.current; //rootFiber
 
-  if (__DEV__) {
-    if (ReactFiberInstrumentation.debugTool) {
-      if (current.alternate === null) {
-        ReactFiberInstrumentation.debugTool.onMountContainer(container);
-      } else if (element === null) {
-        ReactFiberInstrumentation.debugTool.onUnmountContainer(container);
-      } else {
-        ReactFiberInstrumentation.debugTool.onUpdateContainer(container);
-      }
-    }
-  }
+//   if (__DEV__) {
+//     if (ReactFiberInstrumentation.debugTool) {
+//       if (current.alternate === null) {
+//         ReactFiberInstrumentation.debugTool.onMountContainer(container);
+//       } else if (element === null) {
+//         ReactFiberInstrumentation.debugTool.onUnmountContainer(container);
+//       } else {
+//         ReactFiberInstrumentation.debugTool.onUpdateContainer(container);
+//       }
+//     }
+//   }
 
-  const context = getContextForSubtree(parentComponent);
+  const context = getContextForSubtree(parentComponent);//{}
   if (container.context === null) {
     container.context = context;
   } else {

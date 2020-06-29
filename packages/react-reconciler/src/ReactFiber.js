@@ -219,11 +219,11 @@ function FiberNode(
   mode: TypeOfMode,
 ) {
   // Instance
-  this.tag = tag;
-  this.key = key;
-  this.elementType = null;
-  this.type = null;
-  this.stateNode = null;
+  this.tag = tag;//组件类型
+  this.key = key;//组件key
+  this.elementType = null;// 组件标签名 比如App/div等
+  this.type = null;//记录lazy之后是function还是class
+  this.stateNode = null;//rootFiber
 
   // Fiber
   this.return = null;
@@ -233,25 +233,25 @@ function FiberNode(
 
   this.ref = null;
 
-  this.pendingProps = pendingProps;
-  this.memoizedProps = null;
+  this.pendingProps = pendingProps;// 新的props
+  this.memoizedProps = null;//上次更新后的props
   this.updateQueue = null;
-  this.memoizedState = null;
+  this.memoizedState = null;//上次更新后的state
   this.firstContextDependency = null;
 
   this.mode = mode;
 
   // Effects
-  this.effectTag = NoEffect;
+  this.effectTag = NoEffect;//副作用
   this.nextEffect = null;
 
   this.firstEffect = null;
   this.lastEffect = null;
 
-  this.expirationTime = NoWork;
+  this.expirationTime = NoWork;//当前节点产生更新过期时间
   this.childExpirationTime = NoWork;
 
-  this.alternate = null;
+  this.alternate = null;//current <==> work-in-progress
 
   if (enableProfilerTimer) {
     this.actualDuration = 0;
@@ -260,15 +260,15 @@ function FiberNode(
     this.treeBaseDuration = 0;
   }
 
-  if (__DEV__) {
-    this._debugID = debugCounter++;
-    this._debugSource = null;
-    this._debugOwner = null;
-    this._debugIsCurrentlyTiming = false;
-    if (!hasBadMapPolyfill && typeof Object.preventExtensions === 'function') {
-      Object.preventExtensions(this);
-    }
-  }
+//   if (__DEV__) {
+//     this._debugID = debugCounter++;
+//     this._debugSource = null;
+//     this._debugOwner = null;
+//     this._debugIsCurrentlyTiming = false;
+//     if (!hasBadMapPolyfill && typeof Object.preventExtensions === 'function') {
+//       Object.preventExtensions(this);
+//     }
+//   }
 }
 
 // This is a constructor function, rather than a POJO constructor, still

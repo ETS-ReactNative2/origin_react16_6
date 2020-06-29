@@ -106,7 +106,7 @@ export function createFiberRoot(
 ): FiberRoot {
   // Cyclic construction. This cheats the type system right now because
   // stateNode is any.
-  const uninitializedFiber = createHostRootFiber(isConcurrent);
+  const uninitializedFiber = createHostRootFiber(isConcurrent);//创建一个rootFiber
 
   let root;
   if (enableSchedulerTracing) {
@@ -140,9 +140,9 @@ export function createFiberRoot(
     }: FiberRoot);
   } else {
     root = ({
-      current: uninitializedFiber,
-      containerInfo: containerInfo,
-      pendingChildren: null,
+      current: uninitializedFiber,//rootFiber
+      containerInfo: containerInfo,//容器
+      pendingChildren: null,//用于持久化更新
 
       earliestPendingTime: NoWork,
       latestPendingTime: NoWork,
@@ -153,11 +153,11 @@ export function createFiberRoot(
       didError: false,
 
       pendingCommitExpirationTime: NoWork,
-      finishedWork: null,
+      finishedWork: null,//完成的任务
       timeoutHandle: noTimeout,
-      context: null,
+      context: null,//不太常用
       pendingContext: null,
-      hydrate,
+      hydrate,//false
       nextExpirationTimeToWorkOn: NoWork,
       expirationTime: NoWork,
       firstBatch: null,

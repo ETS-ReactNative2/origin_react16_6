@@ -2393,7 +2393,7 @@ function batchedUpdates<A, R>(fn: (a: A) => R, a: A): R {
 // TODO: Batching should be implemented at the renderer level, not inside
 // the reconciler.
 function unbatchedUpdates<A, R>(fn: (a: A) => R, a: A): R {
-  if (isBatchingUpdates && !isUnbatchingUpdates) {
+  if (isBatchingUpdates && !isUnbatchingUpdates) {//是分批更新但不是完整更新
     isUnbatchingUpdates = true;
     try {
       return fn(a);
