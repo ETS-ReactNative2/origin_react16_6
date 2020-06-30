@@ -258,7 +258,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     childToDelete.effectTag = Deletion;
   }
 
-  function deleteRemainingChildren(
+  function deleteRemainingChildren(//将所有子节点都删除
     returnFiber: Fiber,
     currentFirstChild: Fiber | null,
   ): null {
@@ -1076,7 +1076,7 @@ function ChildReconciler(shouldTrackSideEffects) {
 
     return resultingFirstChild;
   }
-
+  //文本节点
   function reconcileSingleTextNode(
     returnFiber: Fiber,
     currentFirstChild: Fiber | null,
@@ -1087,15 +1087,15 @@ function ChildReconciler(shouldTrackSideEffects) {
     // way to define them.
     if (currentFirstChild !== null && currentFirstChild.tag === HostText) {
       // We already have an existing node so let's just update it and delete
-      // the rest.
-      deleteRemainingChildren(returnFiber, currentFirstChild.sibling);
+      // the rest. 原先是文本节点
+      deleteRemainingChildren(returnFiber, currentFirstChild.sibling);//将兄弟节点全部删除
       const existing = useFiber(currentFirstChild, textContent, expirationTime);
       existing.return = returnFiber;
       return existing;
     }
     // The existing first child is not a text node so we need to create one
     // and delete the existing ones.
-    deleteRemainingChildren(returnFiber, currentFirstChild);
+    deleteRemainingChildren(returnFiber, currentFirstChild);//之前不是文本节点 则直接删除 重新创建一个文本节点
     const created = createFiberFromText(
       textContent,
       returnFiber.mode,
@@ -1107,7 +1107,7 @@ function ChildReconciler(shouldTrackSideEffects) {
 
   function reconcileSingleElement(
     returnFiber: Fiber,
-    currentFirstChild: Fiber | null,
+    currentFirstChild: Fiber | null,//初次渲染没有
     element: ReactElement,
     expirationTime: ExpirationTime,
   ): Fiber {
@@ -1132,10 +1132,10 @@ function ChildReconciler(shouldTrackSideEffects) {
           );
           existing.ref = coerceRef(returnFiber, child, element);
           existing.return = returnFiber;
-          if (__DEV__) {
-            existing._debugSource = element._source;
-            existing._debugOwner = element._owner;
-          }
+        //   if (__DEV__) {
+        //     existing._debugSource = element._source;
+        //     existing._debugOwner = element._owner;
+        //   }
           return existing;
         } else {
           deleteRemainingChildren(returnFiber, child);
@@ -1148,7 +1148,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
 
     if (element.type === REACT_FRAGMENT_TYPE) {
-      const created = createFiberFromFragment(
+      const created = createFiberFromFragment(//生成一个FiberNode
         element.props.children,
         returnFiber.mode,
         expirationTime,
@@ -1157,7 +1157,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       created.return = returnFiber;
       return created;
     } else {
-      const created = createFiberFromElement(
+      const created = createFiberFromElement(//其他的
         element,
         returnFiber.mode,
         expirationTime,
@@ -1216,9 +1216,9 @@ function ChildReconciler(shouldTrackSideEffects) {
   // itself. They will be added to the side-effect list as we pass through the
   // children and the parent.
   function reconcileChildFibers(
-    returnFiber: Fiber,
-    currentFirstChild: Fiber | null,
-    newChild: any,
+    returnFiber: Fiber,//workInProgress
+    currentFirstChild: Fiber | null,//FiberNode.alternate
+    newChild: any,//返回的elementList
     expirationTime: ExpirationTime,
   ): Fiber | null {
     // This function is not recursive.
@@ -1229,7 +1229,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     // Handle top level unkeyed fragments as if they were arrays.
     // This leads to an ambiguity between <>{[...]}</> and <>...</>.
     // We treat the ambiguous cases above the same.
-    const isUnkeyedTopLevelFragment =
+    const isUnkeyedTopLevelFragment = //是一个Fragment拿到children对象在进行下面的操作
       typeof newChild === 'object' &&
       newChild !== null &&
       newChild.type === REACT_FRAGMENT_TYPE &&
@@ -1242,7 +1242,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     const isObject = typeof newChild === 'object' && newChild !== null;
 
     if (isObject) {
-      switch (newChild.$$typeof) {
+      switch (newChild.$$typeof) {//通过createElement创建的都是REACT_ELEMENT_TYPE
         case REACT_ELEMENT_TYPE:
           return placeSingleChild(
             reconcileSingleElement(
@@ -1264,7 +1264,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
     }
 
-    if (typeof newChild === 'string' || typeof newChild === 'number') {
+    if (typeof newChild === 'string' || typeof newChild === 'number') {//文本节点
       return placeSingleChild(
         reconcileSingleTextNode(
           returnFiber,
@@ -1284,7 +1284,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       );
     }
 
-    if (getIteratorFn(newChild)) {
+    if (getIteratorFn(newChild)) {//iterator
       return reconcileChildrenIterator(
         returnFiber,
         currentFirstChild,
@@ -1293,33 +1293,33 @@ function ChildReconciler(shouldTrackSideEffects) {
       );
     }
 
-    if (isObject) {
+    if (isObject) {//是对象不满足上面 则错误
       throwOnInvalidObjectType(returnFiber, newChild);
     }
 
-    if (__DEV__) {
-      if (typeof newChild === 'function') {
-        warnOnFunctionType();
-      }
-    }
+    // if (__DEV__) {
+    //   if (typeof newChild === 'function') {
+    //     warnOnFunctionType();
+    //   }
+    // }
     if (typeof newChild === 'undefined' && !isUnkeyedTopLevelFragment) {
       // If the new child is undefined, and the return fiber is a composite
       // component, throw an error. If Fiber return types are disabled,
       // we already threw above.
       switch (returnFiber.tag) {
         case ClassComponent: {
-          if (__DEV__) {
-            const instance = returnFiber.stateNode;
-            if (instance.render._isMockFunction) {
-              // We allow auto-mocks to proceed as if they're returning null.
-              break;
-            }
-          }
+        //   if (__DEV__) {
+        //     const instance = returnFiber.stateNode;
+        //     if (instance.render._isMockFunction) {
+        //       // We allow auto-mocks to proceed as if they're returning null.
+        //       break;
+        //     }
+        //   }
         }
         // Intentionally fall through to the next case, which handles both
         // functions and classes
         // eslint-disable-next-lined no-fallthrough
-        case FunctionComponent: {
+        case FunctionComponent: {//函数组件没有任何返回 警告
           const Component = returnFiber.type;
           invariant(
             false,
@@ -1332,7 +1332,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
     }
 
-    // Remaining cases are all treated as empty.
+    // Remaining cases are all treated as empty.上面都不满足则返回的是一个null,则需要把现有的节点子节点都删除
     return deleteRemainingChildren(returnFiber, currentFirstChild);
   }
 

@@ -407,17 +407,18 @@ function updateFunctionComponent(
   let nextChildren;
   prepareToReadContext(workInProgress, renderExpirationTime);
   if (__DEV__) {
-    ReactCurrentOwner.current = workInProgress;
-    ReactCurrentFiber.setCurrentPhase('render');
-    nextChildren = Component(nextProps, context);
-    ReactCurrentFiber.setCurrentPhase(null);
+    // ReactCurrentOwner.current = workInProgress;
+    // ReactCurrentFiber.setCurrentPhase('render');
+    // nextChildren = Component(nextProps, context);
+    // ReactCurrentFiber.setCurrentPhase(null);
   } else {
-    nextChildren = Component(nextProps, context);
+    nextChildren = Component(nextProps, context);//context为react.createContext值
+    //返回elementList
   }
 
   // React DevTools reads this flag.
   workInProgress.effectTag |= PerformedWork;
-  reconcileChildren(
+  reconcileChildren(//调和子节点
     current,
     workInProgress,
     nextChildren,
@@ -1451,7 +1452,7 @@ function updateContextConsumer(
   }
   */
 
-function bailoutOnAlreadyFinishedWork(
+function bailoutOnAlreadyFinishedWork(//跳过不需要更新的
   current: Fiber | null,
   workInProgress: Fiber,
   renderExpirationTime: ExpirationTime,
@@ -1463,15 +1464,15 @@ function bailoutOnAlreadyFinishedWork(
     workInProgress.firstContextDependency = current.firstContextDependency;
   }
 
-  if (enableProfilerTimer) {
-    // Don't update "base" render times for bailouts.
-    stopProfilerTimerIfRunning(workInProgress);
-  }
+//   if (enableProfilerTimer) {
+//     // Don't update "base" render times for bailouts.
+//     stopProfilerTimerIfRunning(workInProgress);
+//   }
 
   // Check if the children have any pending work.
   const childExpirationTime = workInProgress.childExpirationTime;
   if (
-    childExpirationTime === NoWork ||
+    childExpirationTime === NoWork ||//子树的更新不需要本次更新
     childExpirationTime > renderExpirationTime
   ) {
     // The children don't have any work either. We can skip them.
@@ -1481,26 +1482,26 @@ function bailoutOnAlreadyFinishedWork(
   } else {
     // This fiber doesn't have work, but its subtree does. Clone the child
     // fibers and continue.
-    cloneChildFibers(current, workInProgress);
+    cloneChildFibers(current, workInProgress);//当前节点没有更新直接clone child有更新
     return workInProgress.child;
   }
 }
 
 function beginWork(
-  current: Fiber | null,
+  current: Fiber | null,//rootFiber
   workInProgress: Fiber,
-  renderExpirationTime: ExpirationTime,
+  renderExpirationTime: ExpirationTime,//FiberRoot的
 ): Fiber | null {
   const updateExpirationTime = workInProgress.expirationTime;
 
-  if (current !== null) {
+  if (current !== null) {//证明是RootFiber
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;
     if (
       oldProps === newProps &&
       !hasLegacyContextChanged() &&
-      (updateExpirationTime === NoWork ||
-        updateExpirationTime > renderExpirationTime)
+      (updateExpirationTime === NoWork ||//没有更新
+        updateExpirationTime > renderExpirationTime)//或者Fiber优先级不高 不需要这次更新
     ) {
       // This fiber does not have any pending work. Bailout without entering
       // the begin phase. There's still some bookkeeping we that needs to be done
@@ -1587,7 +1588,7 @@ function beginWork(
   }
 
   // Before entering the begin phase, clear the expiration time.
-  workInProgress.expirationTime = NoWork;
+  workInProgress.expirationTime = NoWork;//开始更新前先把当前节点设置为没有更新了
 
   switch (workInProgress.tag) {
     case IndeterminateComponent: {
@@ -1609,9 +1610,9 @@ function beginWork(
         renderExpirationTime,
       );
     }
-    case FunctionComponent: {
+    case FunctionComponent: {//函数组件
       const Component = workInProgress.type;
-      const unresolvedProps = workInProgress.pendingProps;
+      const unresolvedProps = workInProgress.pendingProps;//新的一次渲染的props
       const resolvedProps =
         workInProgress.elementType === Component
           ? unresolvedProps

@@ -345,12 +345,12 @@ export function createWorkInProgress(
     workInProgress.type = current.type;
     workInProgress.stateNode = current.stateNode;
 
-    if (__DEV__) {
-      // DEV-only fields
-      workInProgress._debugID = current._debugID;
-      workInProgress._debugSource = current._debugSource;
-      workInProgress._debugOwner = current._debugOwner;
-    }
+    // if (__DEV__) {
+    //   // DEV-only fields
+    //   workInProgress._debugID = current._debugID;
+    //   workInProgress._debugSource = current._debugSource;
+    //   workInProgress._debugOwner = current._debugOwner;
+    // }
 
     workInProgress.alternate = current;
     current.alternate = workInProgress;
@@ -366,14 +366,14 @@ export function createWorkInProgress(
     workInProgress.firstEffect = null;
     workInProgress.lastEffect = null;
 
-    if (enableProfilerTimer) {
-      // We intentionally reset, rather than copy, actualDuration & actualStartTime.
-      // This prevents time from endlessly accumulating in new commits.
-      // This has the downside of resetting values for different priority renders,
-      // But works for yielding (the common case) and should support resuming.
-      workInProgress.actualDuration = 0;
-      workInProgress.actualStartTime = -1;
-    }
+    // if (enableProfilerTimer) {
+    //   // We intentionally reset, rather than copy, actualDuration & actualStartTime.
+    //   // This prevents time from endlessly accumulating in new commits.
+    //   // This has the downside of resetting values for different priority renders,
+    //   // But works for yielding (the common case) and should support resuming.
+    //   workInProgress.actualDuration = 0;
+    //   workInProgress.actualStartTime = -1;
+    // }
   }
 
   workInProgress.childExpirationTime = current.childExpirationTime;
@@ -425,11 +425,11 @@ export function createFiberFromTypeAndProps(
   // The resolved type is set if we know what the final type will be. I.e. it's not lazy.
   let resolvedType = type;
   if (typeof type === 'function') {
-    if (shouldConstruct(type)) {
+    if (shouldConstruct(type)) {//函数还是类组件
       fiberTag = ClassComponent;
     }
   } else if (typeof type === 'string') {
-    fiberTag = HostComponent;
+    fiberTag = HostComponent;//div等原生标签
   } else {
     getTag: switch (type) {
       case REACT_FRAGMENT_TYPE:
@@ -480,23 +480,23 @@ export function createFiberFromTypeAndProps(
           }
         }
         let info = '';
-        if (__DEV__) {
-          if (
-            type === undefined ||
-            (typeof type === 'object' &&
-              type !== null &&
-              Object.keys(type).length === 0)
-          ) {
-            info +=
-              ' You likely forgot to export your component from the file ' +
-              "it's defined in, or you might have mixed up default and " +
-              'named imports.';
-          }
-          const ownerName = owner ? getComponentName(owner.type) : null;
-          if (ownerName) {
-            info += '\n\nCheck the render method of `' + ownerName + '`.';
-          }
-        }
+        // if (__DEV__) {
+        //   if (
+        //     type === undefined ||
+        //     (typeof type === 'object' &&
+        //       type !== null &&
+        //       Object.keys(type).length === 0)
+        //   ) {
+        //     info +=
+        //       ' You likely forgot to export your component from the file ' +
+        //       "it's defined in, or you might have mixed up default and " +
+        //       'named imports.';
+        //   }
+        //   const ownerName = owner ? getComponentName(owner.type) : null;
+        //   if (ownerName) {
+        //     info += '\n\nCheck the render method of `' + ownerName + '`.';
+        //   }
+        // }
         invariant(
           false,
           'Element type is invalid: expected a string (for built-in ' +
@@ -523,9 +523,9 @@ export function createFiberFromElement(
   expirationTime: ExpirationTime,
 ): Fiber {
   let owner = null;
-  if (__DEV__) {
-    owner = element._owner;
-  }
+//   if (__DEV__) {
+//     owner = element._owner;
+//   }
   const type = element.type;
   const key = element.key;
   const pendingProps = element.props;
@@ -537,10 +537,10 @@ export function createFiberFromElement(
     mode,
     expirationTime,
   );
-  if (__DEV__) {
-    fiber._debugSource = element._source;
-    fiber._debugOwner = element._owner;
-  }
+//   if (__DEV__) {
+//     fiber._debugSource = element._source;
+//     fiber._debugOwner = element._owner;
+//   }
   return fiber;
 }
 
